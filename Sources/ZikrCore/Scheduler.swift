@@ -1,6 +1,5 @@
 import Foundation
 
-/// Decides when a Reminder is due and which Remembrance it shows.
 /// Every event takes the current time, so tests can drive it with a fake clock.
 public final class Scheduler {
     public static let allowedIntervals = 1...180
@@ -36,7 +35,6 @@ public final class Scheduler {
         return show(at: now)
     }
 
-    /// Call often; returns a Remembrance when a Reminder is due.
     public func tick(at now: Date) -> Remembrance? {
         if let end = state.pauseEnd {
             if now >= end { resume(at: now) }

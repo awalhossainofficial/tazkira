@@ -1,7 +1,6 @@
 import Foundation
 import ZikrCore
 
-/// Saves the Scheduler's settings in UserDefaults so they survive a restart.
 enum StateStore {
     private static let key = "schedulerState"
 

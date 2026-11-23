@@ -1,6 +1,5 @@
 import ServiceManagement
 
-/// Opening Zikr when the user logs in.
 enum LoginItem {
     static var isOn: Bool { SMAppService.mainApp.status == .enabled }
     static var needsApproval: Bool { SMAppService.mainApp.status == .requiresApproval }

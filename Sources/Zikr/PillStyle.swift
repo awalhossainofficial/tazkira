@@ -2,7 +2,6 @@ import AppKit
 import SwiftUI
 import ZikrCore
 
-/// The black shape at one moment: its size, corner rounding and visibility.
 struct PillShape: Equatable {
     var width: CGFloat
     var height: CGFloat
@@ -10,7 +9,6 @@ struct PillShape: Equatable {
     var opacity: Double = 1
 }
 
-/// What a Pill Style needs to know about the screen it appears on.
 struct ScreenInfo {
     var hasNotch: Bool
     var notchWidth: CGFloat
@@ -31,14 +29,7 @@ struct ScreenInfo {
 protocol PillStyle {
     func closedShape(on screen: ScreenInfo) -> PillShape
     func openShape(for remembrance: Remembrance, on screen: ScreenInfo) -> PillShape
-    func hoverShape(for remembrance: Remembrance, on screen: ScreenInfo) -> PillShape
     func content(for remembrance: Remembrance, on screen: ScreenInfo) -> AnyView
-}
-
-extension PillStyle {
-    func hoverShape(for remembrance: Remembrance, on screen: ScreenInfo) -> PillShape {
-        openShape(for: remembrance, on: screen)
-    }
 }
 
 /// Grows out of the notch into a card sized to the text.

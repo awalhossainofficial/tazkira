@@ -131,7 +131,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func chooseCustom() {
         let alert = NSAlert()
         alert.messageText = "Remind me every…"
-        alert.informativeText = "Enter a number of minutes from 1 to 180."
+        alert.informativeText = "Enter a number of minutes from \(intervalRangeText)."
         let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 80, height: 24))
         field.stringValue = String(scheduler.state.intervalMinutes)
         alert.accessoryView = field
@@ -145,11 +145,15 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let minutes = Int(typed), Scheduler.allowedIntervals.contains(minutes) else {
             let refusal = NSAlert()
             refusal.messageText = "“\(typed)” isn’t a valid Interval"
-            refusal.informativeText = "Please enter a whole number of minutes from 1 to 180."
+            refusal.informativeText = "Please enter a whole number of minutes from \(intervalRangeText)."
             refusal.runModal()
             return
         }
         setInterval(minutes)
+    }
+
+    private var intervalRangeText: String {
+        "\(Scheduler.allowedIntervals.lowerBound) to \(Scheduler.allowedIntervals.upperBound)"
     }
 
     private func setInterval(_ minutes: Int) {

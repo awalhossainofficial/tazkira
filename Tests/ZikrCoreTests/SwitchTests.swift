@@ -45,11 +45,4 @@ import Testing
         let after = Scheduler(list: sampleList(3), state: before.state, random: SeededRandom(seed: 2))
         #expect(!show(after, times: 20).contains("r1"))
     }
-
-    @Test func settingsSavedByAnOlderVersionStillLoad() throws {
-        let old = Data(#"{"intervalMinutes":30}"#.utf8)
-        let state = try JSONDecoder().decode(SchedulerState.self, from: old)
-        #expect(state.intervalMinutes == 30)
-        #expect(state.switchedOff.isEmpty)
-    }
 }

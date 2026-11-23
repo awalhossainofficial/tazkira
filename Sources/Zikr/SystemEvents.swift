@@ -1,6 +1,5 @@
 import AppKit
 
-/// Passes macOS sleep, wake, lock and unlock on to the app. Makes no decisions.
 /// Lives as long as the app, so it never removes its observers.
 @MainActor
 final class SystemEvents {

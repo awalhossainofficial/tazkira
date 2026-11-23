@@ -21,6 +21,8 @@ import Testing
 
     @Test func settingsSavedBeforeThisVersionCountAsLaunchedBefore() throws {
         let old = try JSONDecoder().decode(SchedulerState.self, from: Data(#"{"intervalMinutes":30}"#.utf8))
+        #expect(old.intervalMinutes == 30)
+        #expect(old.switchedOff.isEmpty)
         #expect(launch(with: old).1 == nil)
     }
 }

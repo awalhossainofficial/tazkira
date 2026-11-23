@@ -2,7 +2,6 @@ import AppKit
 import SwiftUI
 import ZikrCore
 
-/// Shows a Reminder in the Pill on the screen the mouse is on, then hides it.
 @MainActor
 final class PillPresenter {
     private let style: PillStyle
@@ -13,6 +12,7 @@ final class PillPresenter {
     private var timerStarted = ContinuousClock.now
     private var hideTask: Task<Void, Never>?
     private var isShowing = false
+    private var isHovered = false
 
     /// Room around the Pill for its shadow.
     private let margin: CGFloat = 40
@@ -60,12 +60,19 @@ final class PillPresenter {
             }
         }
         model.closedShape = style.closedShape(on: info)
-        restartTimer(for: showFor)
+        if isHovered {
+            // The clock starts when the mouse leaves.
+            hideTask?.cancel()
+            remaining = showFor
+        } else {
+            restartTimer(for: showFor)
+        }
     }
 
     func hide() {
         guard isShowing else { return }
         isShowing = false
+        isHovered = false
         hideTask?.cancel()
         withAnimation(.spring(response: 0.4, dampingFraction: 0.9)) {
             model.shape = model.closedShape
@@ -81,6 +88,7 @@ final class PillPresenter {
     // Hovering freezes the countdown; leaving resumes the time that was left.
     private func hoverChanged(_ inside: Bool) {
         guard isShowing else { return }
+        isHovered = inside
         if inside {
             hideTask?.cancel()
             remaining -= ContinuousClock.now - timerStarted

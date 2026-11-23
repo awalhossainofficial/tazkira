@@ -1,6 +1,5 @@
 import Foundation
 
-/// The settings that survive a restart.
 public struct SchedulerState: Codable, Equatable, Sendable {
     public var intervalMinutes: Int
     public var pauseEnd: Date?
@@ -30,5 +29,4 @@ public struct IntervalError: Error, Equatable {
     public let minutes: Int
 }
 
-/// At least one Remembrance must stay switched on.
 public struct LastRemembranceError: Error, Equatable {}
