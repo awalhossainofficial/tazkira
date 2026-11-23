@@ -8,6 +8,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        ArabicFont.registerBundledFonts()
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         let icon = NSImage(systemSymbolName: "moon.stars", accessibilityDescription: "Zikr")
         icon?.isTemplate = true
