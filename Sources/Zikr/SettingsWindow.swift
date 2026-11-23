@@ -33,6 +33,8 @@ final class SettingsModel {
     private let scheduler: Scheduler
     private let onChange: () -> Void
     private(set) var switchedOff: Set<String> = []
+    private(set) var opensAtLogin = false
+    private(set) var loginNote: String?
     var refusal: String?
 
     init(scheduler: Scheduler, onChange: @escaping () -> Void) {
@@ -43,6 +45,25 @@ final class SettingsModel {
     func refresh() {
         switchedOff = scheduler.state.switchedOff
         refusal = nil
+        readLoginItem()
+    }
+
+    var opensAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { self.opensAtLogin },
+            set: { on in
+                do { try LoginItem.set(on) } catch { self.loginNote = "macOS didn’t accept that change. Try again in a moment." }
+                self.readLoginItem(keepingNote: true)
+            })
+    }
+
+    private func readLoginItem(keepingNote: Bool = false) {
+        opensAtLogin = LoginItem.isOn || LoginItem.needsApproval
+        if LoginItem.needsApproval {
+            loginNote = "Allow Zikr in System Settings › General › Login Items."
+        } else if !keepingNote {
+            loginNote = nil
+        }
     }
 
     func binding(for id: String) -> Binding<Bool> {
@@ -68,6 +89,12 @@ private struct SettingsView: View {
         Form {
             if let refusal = model.refusal {
                 Text(refusal).foregroundStyle(.red)
+            }
+            Section("General") {
+                Toggle("Open Zikr at login", isOn: model.opensAtLoginBinding)
+                if let note = model.loginNote {
+                    Text(note).font(.caption).foregroundStyle(.secondary)
+                }
             }
             Section("Remembrances") {
                 ForEach(BuiltInList.all) { remembrance in

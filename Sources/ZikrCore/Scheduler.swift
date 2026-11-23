@@ -29,6 +29,13 @@ public final class Scheduler {
         restartCountdown(at: now)
     }
 
+    /// Only the very first launch greets the user with a Reminder.
+    public func firstLaunchReminder(at now: Date) -> Remembrance? {
+        guard !state.hasLaunchedBefore else { return nil }
+        state.hasLaunchedBefore = true
+        return show(at: now)
+    }
+
     /// Call often; returns a Remembrance when a Reminder is due.
     public func tick(at now: Date) -> Remembrance? {
         if let end = state.pauseEnd {

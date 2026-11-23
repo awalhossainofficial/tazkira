@@ -23,6 +23,10 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = item
 
         scheduler.start(at: Date())
+        if let welcome = scheduler.firstLaunchReminder(at: Date()) {
+            pill.show(welcome)
+            try? LoginItem.set(true)
+        }
         StateStore.save(scheduler.state)
         systemEvents = SystemEvents { [weak self] event in self?.handle(event) }
         ticker = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
