@@ -3,9 +3,11 @@ import ZikrCore
 
 @MainActor
 final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
-    private let scheduler = Scheduler(list: BuiltInList.all)
+    private let scheduler = Scheduler(list: BuiltInList.all, state: StateStore.load())
     private let pill = PillPresenter()
     private var statusItem: NSStatusItem?
+    private var ticker: Timer?
+    private let presetIntervals = [5, 10, 15, 30]
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         ArabicFont.registerBundledFonts()
@@ -17,6 +19,11 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.delegate = self
         item.menu = menu
         statusItem = item
+
+        scheduler.start(at: Date())
+        ticker = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.tick() }
+        }
         // For checking the Pill by hand: open Zikr.app --args -remindOnLaunch YES
         if UserDefaults.standard.bool(forKey: "remindOnLaunch") { remindMeNow() }
     }
@@ -26,11 +33,69 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.removeAllItems()
         menu.addItem(action("Remind me now", #selector(remindMeNow)))
         menu.addItem(.separator())
+        menu.addItem(intervalMenu())
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Zikr", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+    }
+
+    private func intervalMenu() -> NSMenuItem {
+        let current = scheduler.state.intervalMinutes
+        let submenu = NSMenu()
+        for minutes in presetIntervals {
+            let item = action("\(minutes) minutes", #selector(choosePreset(_:)))
+            item.tag = minutes
+            item.state = minutes == current ? .on : .off
+            submenu.addItem(item)
+        }
+        let isCustom = !presetIntervals.contains(current)
+        let custom = action(isCustom ? "Custom (\(current) min)…" : "Custom…", #selector(chooseCustom))
+        custom.state = isCustom ? .on : .off
+        submenu.addItem(custom)
+
+        let parent = NSMenuItem(title: "Every \(current) min", action: nil, keyEquivalent: "")
+        parent.submenu = submenu
+        return parent
+    }
+
+    private func tick() {
+        if let due = scheduler.tick(at: Date()) { pill.show(due) }
     }
 
     @objc private func remindMeNow() {
         pill.show(scheduler.remindMeNow(at: Date()))
+    }
+
+    @objc private func choosePreset(_ sender: NSMenuItem) {
+        setInterval(sender.tag)
+    }
+
+    @objc private func chooseCustom() {
+        let alert = NSAlert()
+        alert.messageText = "Remind me every…"
+        alert.informativeText = "Enter a number of minutes from 1 to 180."
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 80, height: 24))
+        field.stringValue = String(scheduler.state.intervalMinutes)
+        alert.accessoryView = field
+        alert.addButton(withTitle: "Set")
+        alert.addButton(withTitle: "Cancel")
+        alert.window.initialFirstResponder = field
+        NSApp.activate()
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        let typed = field.stringValue.trimmingCharacters(in: .whitespaces)
+        guard let minutes = Int(typed), Scheduler.allowedIntervals.contains(minutes) else {
+            let refusal = NSAlert()
+            refusal.messageText = "“\(typed)” isn’t a valid Interval"
+            refusal.informativeText = "Please enter a whole number of minutes from 1 to 180."
+            refusal.runModal()
+            return
+        }
+        setInterval(minutes)
+    }
+
+    private func setInterval(_ minutes: Int) {
+        guard (try? scheduler.setInterval(minutes, at: Date())) != nil else { return }
+        StateStore.save(scheduler.state)
     }
 
     private func action(_ title: String, _ selector: Selector) -> NSMenuItem {
