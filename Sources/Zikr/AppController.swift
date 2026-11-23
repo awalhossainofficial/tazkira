@@ -22,6 +22,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = item
 
         scheduler.start(at: Date())
+        StateStore.save(scheduler.state)
         systemEvents = SystemEvents { [weak self] event in self?.handle(event) }
         ticker = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
@@ -36,6 +37,16 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(action("Remind me now", #selector(remindMeNow)))
         menu.addItem(.separator())
         menu.addItem(intervalMenu())
+        menu.addItem(.separator())
+        if let end = scheduler.pausedUntil {
+            let status = NSMenuItem(title: "Paused until \(pauseEndText(end))", action: nil, keyEquivalent: "")
+            status.isEnabled = false
+            menu.addItem(status)
+            menu.addItem(action("Resume", #selector(resume)))
+        } else {
+            menu.addItem(action("Pause for 1 hour", #selector(pauseForAnHour)))
+            menu.addItem(action("Pause until tomorrow", #selector(pauseUntilTomorrow)))
+        }
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Zikr", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
@@ -70,7 +81,31 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func tick() {
+        let wasPaused = scheduler.pausedUntil != nil
         if let due = scheduler.tick(at: Date()) { pill.show(due) }
+        if wasPaused, scheduler.pausedUntil == nil { StateStore.save(scheduler.state) }
+    }
+
+    private func pauseEndText(_ end: Date) -> String {
+        let time = end.formatted(date: .omitted, time: .shortened)
+        return Calendar.current.isDateInToday(end) ? time : "tomorrow \(time)"
+    }
+
+    @objc private func pauseForAnHour() {
+        scheduler.pauseForAnHour(at: Date())
+        pill.hide()
+        StateStore.save(scheduler.state)
+    }
+
+    @objc private func pauseUntilTomorrow() {
+        scheduler.pauseUntilTomorrow(at: Date())
+        pill.hide()
+        StateStore.save(scheduler.state)
+    }
+
+    @objc private func resume() {
+        scheduler.resume(at: Date())
+        StateStore.save(scheduler.state)
     }
 
     @objc private func remindMeNow() {

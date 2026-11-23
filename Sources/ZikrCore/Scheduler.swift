@@ -7,6 +7,7 @@ public final class Scheduler {
 
     public private(set) var state: SchedulerState
     private let list: [Remembrance]
+    private let calendar: Calendar
     private var random: AnyRandom
     private var nextDue: Date?
     private var round: [Remembrance] = []
@@ -15,20 +16,43 @@ public final class Scheduler {
     private var isLocked = false
 
     public init(list: [Remembrance], state: SchedulerState = SchedulerState(),
+                calendar: Calendar = .current,
                 random: some RandomNumberGenerator = SystemRandomNumberGenerator()) {
         self.list = list
         self.state = state
+        self.calendar = calendar
         self.random = AnyRandom(random)
     }
 
     public func start(at now: Date) {
+        if let end = state.pauseEnd, now >= end { state.pauseEnd = nil }
         restartCountdown(at: now)
     }
 
     /// Call often; returns a Remembrance when a Reminder is due.
     public func tick(at now: Date) -> Remembrance? {
+        if let end = state.pauseEnd {
+            if now >= end { resume(at: now) }
+            return nil
+        }
         guard !isAway, let nextDue, now >= nextDue else { return nil }
         return show(at: now)
+    }
+
+    public var pausedUntil: Date? { state.pauseEnd }
+
+    public func pauseForAnHour(at now: Date) {
+        state.pauseEnd = now.addingTimeInterval(60 * 60)
+    }
+
+    public func pauseUntilTomorrow(at now: Date) {
+        state.pauseEnd = calendar.nextDate(after: now, matching: DateComponents(hour: 6, minute: 0),
+                                           matchingPolicy: .nextTime)
+    }
+
+    public func resume(at now: Date) {
+        state.pauseEnd = nil
+        restartCountdown(at: now)
     }
 
     public func didSleep(at now: Date) { isAsleep = true }
