@@ -15,7 +15,7 @@ struct SeededRandom: RandomNumberGenerator {
 }
 
 func sampleList(_ count: Int) -> [Remembrance] {
-    (1...count).map { Remembrance(id: "r\($0)", kind: .zikr, arabic: "ع\($0)", meaning: "m\($0)", source: "s\($0)") }
+    (1...count).map { Remembrance(id: "r\($0)", kind: .zikr, arabic: "ع\($0)", transliteration: "t\($0)", meaning: "m\($0)", source: "s\($0)") }
 }
 
 let start = Date(timeIntervalSince1970: 1_800_000_000)

@@ -7,7 +7,7 @@ A Mac menu-bar app that gently reminds the user to remember Allah through the da
 ### What is shown
 
 **Remembrance**:
-One piece of text to recite: a Zikr, a Dua or a Durood, shown in Arabic with a short English meaning.
+One piece of text to recite: a Zikr, a Dua or a Durood, shown in Arabic, then in English letters (its Transliteration), then with a short English meaning.
 _Avoid_: Item, quote, message, card
 
 **Zikr**:

@@ -117,6 +117,7 @@ private struct RemembranceRow: View {
                 .font(ArabicFont.font(size: 20))
                 .multilineTextAlignment(.trailing)
                 .frame(maxWidth: .infinity, alignment: .trailing)
+            Text(remembrance.transliteration).italic()
             Text(remembrance.meaning)
             Text("\(remembrance.kind.rawValue) · \(remembrance.source)")
                 .font(.caption)
