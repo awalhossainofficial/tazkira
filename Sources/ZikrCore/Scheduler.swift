@@ -80,6 +80,25 @@ public final class Scheduler {
         restartCountdown(at: now)
     }
 
+    public func isOn(_ id: String) -> Bool { !state.switchedOff.contains(id) }
+
+    public func setOn(_ id: String, _ on: Bool) throws {
+        guard on != isOn(id) else { return }
+        if on {
+            state.switchedOff.remove(id)
+            // Only a Round already under way needs it added; a new one picks it up anyway.
+            if !round.isEmpty, let remembrance = list.first(where: { $0.id == id }) {
+                round.insert(remembrance, at: Int.random(in: 0...round.count, using: &random))
+            }
+        } else {
+            guard switchedOn.count > 1 else { throw LastRemembranceError() }
+            state.switchedOff.insert(id)
+            round.removeAll { $0.id == id }
+        }
+    }
+
+    private var switchedOn: [Remembrance] { list.filter { isOn($0.id) } }
+
     private func show(at now: Date) -> Remembrance {
         restartCountdown(at: now)
         if round.isEmpty { round = newRound() }
@@ -90,7 +109,7 @@ public final class Scheduler {
 
     // A new shuffle never opens with the one just shown.
     private func newRound() -> [Remembrance] {
-        var shuffled = list.shuffled(using: &random)
+        var shuffled = switchedOn.shuffled(using: &random)
         if shuffled.count > 1, shuffled.first == lastShown {
             shuffled.swapAt(0, Int.random(in: 1..<shuffled.count, using: &random))
         }

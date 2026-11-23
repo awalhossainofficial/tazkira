@@ -9,6 +9,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var ticker: Timer?
     private var systemEvents: SystemEvents?
     private let presetIntervals = [5, 10, 15, 30]
+    private lazy var settings = SettingsWindow(scheduler: scheduler) { [unowned self] in StateStore.save(scheduler.state) }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         ArabicFont.registerBundledFonts()
@@ -48,6 +49,9 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(action("Pause until tomorrow", #selector(pauseUntilTomorrow)))
         }
         menu.addItem(.separator())
+        let settingsItem = action("Settings…", #selector(openSettings))
+        settingsItem.keyEquivalent = ","
+        menu.addItem(settingsItem)
         menu.addItem(NSMenuItem(title: "Quit Zikr", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
 
@@ -101,6 +105,10 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         scheduler.pauseUntilTomorrow(at: Date())
         pill.hide()
         StateStore.save(scheduler.state)
+    }
+
+    @objc private func openSettings() {
+        settings.show()
     }
 
     @objc private func resume() {
