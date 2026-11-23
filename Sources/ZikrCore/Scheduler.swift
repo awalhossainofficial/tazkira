@@ -9,6 +9,8 @@ public final class Scheduler {
     private let list: [Remembrance]
     private var random: AnyRandom
     private var nextDue: Date?
+    private var round: [Remembrance] = []
+    private var lastShown: Remembrance?
 
     public init(list: [Remembrance], state: SchedulerState = SchedulerState(),
                 random: some RandomNumberGenerator = SystemRandomNumberGenerator()) {
@@ -39,7 +41,19 @@ public final class Scheduler {
 
     private func show(at now: Date) -> Remembrance {
         restartCountdown(at: now)
-        return list.randomElement(using: &random)!
+        if round.isEmpty { round = newRound() }
+        let next = round.removeFirst()
+        lastShown = next
+        return next
+    }
+
+    // A new shuffle never opens with the one just shown.
+    private func newRound() -> [Remembrance] {
+        var shuffled = list.shuffled(using: &random)
+        if shuffled.count > 1, shuffled.first == lastShown {
+            shuffled.swapAt(0, Int.random(in: 1..<shuffled.count, using: &random))
+        }
+        return shuffled
     }
 
     private func restartCountdown(at now: Date) {

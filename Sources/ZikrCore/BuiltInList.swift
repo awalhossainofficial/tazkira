@@ -1,15 +1,73 @@
-import Foundation
-
-/// The Remembrances that ship with the app.
+/// The Remembrances that ship with the app. Ids are saved for the on/off
+/// choices, so never change an existing id.
 public enum BuiltInList {
-    public static let all: [Remembrance] = [
+    public static let all: [Remembrance] = adhkar + [durood] + duas
+
+    static let adhkar: [Remembrance] = [
         Remembrance(id: "subhanallah-wa-bihamdihi", kind: .zikr,
-                    arabic: "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
-                    meaning: "Glory be to Allah, and praise be to Him.",
-                    source: "Bukhari 6405"),
+                    arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+                    meaning: "Glory be to Allah and praise be to Him.",
+                    source: "Sahih al-Bukhari 6405, Sahih Muslim 2691"),
+        Remembrance(id: "subhanallahil-azim", kind: .zikr,
+                    arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ",
+                    meaning: "Glory be to Allah and praise be to Him; glory be to Allah, the Most Great.",
+                    source: "Sahih al-Bukhari 6682, Sahih Muslim 2694"),
         Remembrance(id: "alhamdulillah", kind: .zikr,
-                    arabic: "الْحَمْدُ لِلّٰهِ",
+                    arabic: "الْحَمْدُ لِلَّهِ",
                     meaning: "All praise is for Allah.",
-                    source: "Muslim 223"),
+                    source: "Sahih Muslim 223"),
+        Remembrance(id: "four-beloved-words", kind: .zikr,
+                    arabic: "سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَٰهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ",
+                    meaning: "Glory be to Allah, all praise is for Allah, there is no god but Allah, and Allah is the Greatest.",
+                    source: "Sahih Muslim 2137"),
+        Remembrance(id: "la-ilaha-illallah-wahdahu", kind: .zikr,
+                    arabic: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+                    meaning: "There is no god but Allah alone, with no partner. His is the dominion and His is the praise, and He has power over all things.",
+                    source: "Sahih al-Bukhari 6403, Sahih Muslim 2691"),
+        Remembrance(id: "la-hawla", kind: .zikr,
+                    arabic: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+                    meaning: "There is no power and no strength except with Allah.",
+                    source: "Sahih al-Bukhari 4205, Sahih Muslim 2704"),
+        Remembrance(id: "astaghfirullah", kind: .zikr,
+                    arabic: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+                    meaning: "I seek Allah's forgiveness and turn to Him in repentance.",
+                    source: "Sahih al-Bukhari 6307"),
+        Remembrance(id: "hasbunallah", kind: .zikr,
+                    arabic: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+                    meaning: "Allah is sufficient for us, and He is the best Disposer of affairs.",
+                    source: "Quran 3:173, Sahih al-Bukhari 4563"),
+        Remembrance(id: "adada-khalqihi", kind: .zikr,
+                    arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+                    meaning: "Glory be to Allah and praise be to Him, as many times as the number of His creation, as much as pleases Him, as heavy as His Throne, and as much as the ink of His words.",
+                    source: "Sahih Muslim 2726"),
+    ]
+
+    static let durood = Remembrance(
+        id: "durood-ibrahim", kind: .durood,
+        arabic: "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+        meaning: "O Allah, send prayers on Muhammad and the family of Muhammad, as You sent prayers on Ibrahim and the family of Ibrahim; You are Praiseworthy, Glorious. O Allah, bless Muhammad and the family of Muhammad, as You blessed Ibrahim and the family of Ibrahim; You are Praiseworthy, Glorious.",
+        source: "Sahih al-Bukhari 3370")
+
+    static let duas: [Remembrance] = [
+        Remembrance(id: "rabbana-atina", kind: .dua,
+                    arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+                    meaning: "Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.",
+                    source: "Quran 2:201, Sahih al-Bukhari 6389"),
+        Remembrance(id: "aini-ala-dhikrika", kind: .dua,
+                    arabic: "اللَّهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+                    meaning: "O Allah, help me to remember You, to thank You, and to worship You well.",
+                    source: "Sunan Abi Dawud 1522"),
+        Remembrance(id: "dua-yunus", kind: .dua,
+                    arabic: "لَا إِلَٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+                    meaning: "There is no god but You; glory be to You. Truly I have been among the wrongdoers.",
+                    source: "Quran 21:87, Jami at-Tirmidhi 3505"),
+        Remembrance(id: "muqallib-al-qulub", kind: .dua,
+                    arabic: "يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَىٰ دِينِكَ",
+                    meaning: "O Turner of hearts, keep my heart firm on Your religion.",
+                    source: "Jami at-Tirmidhi 2140"),
+        Remembrance(id: "hamm-wal-hazan", kind: .dua,
+                    arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",
+                    meaning: "O Allah, I seek refuge in You from worry and grief, from weakness and laziness, from miserliness and cowardice, from the burden of debt and from being overpowered by men.",
+                    source: "Sahih al-Bukhari 6369"),
     ]
 }
