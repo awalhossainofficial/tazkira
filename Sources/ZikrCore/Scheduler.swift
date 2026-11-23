@@ -11,6 +11,8 @@ public final class Scheduler {
     private var nextDue: Date?
     private var round: [Remembrance] = []
     private var lastShown: Remembrance?
+    private var isAsleep = false
+    private var isLocked = false
 
     public init(list: [Remembrance], state: SchedulerState = SchedulerState(),
                 random: some RandomNumberGenerator = SystemRandomNumberGenerator()) {
@@ -25,9 +27,24 @@ public final class Scheduler {
 
     /// Call often; returns a Remembrance when a Reminder is due.
     public func tick(at now: Date) -> Remembrance? {
-        guard let nextDue, now >= nextDue else { return nil }
+        guard !isAway, let nextDue, now >= nextDue else { return nil }
         return show(at: now)
     }
+
+    public func didSleep(at now: Date) { isAsleep = true }
+    public func didLock(at now: Date) { isLocked = true }
+
+    public func didWake(at now: Date) {
+        isAsleep = false
+        restartCountdown(at: now)
+    }
+
+    public func didUnlock(at now: Date) {
+        isLocked = false
+        restartCountdown(at: now)
+    }
+
+    private var isAway: Bool { isAsleep || isLocked }
 
     public func remindMeNow(at now: Date) -> Remembrance {
         show(at: now)

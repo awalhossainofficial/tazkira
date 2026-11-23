@@ -7,6 +7,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let pill = PillPresenter()
     private var statusItem: NSStatusItem?
     private var ticker: Timer?
+    private var systemEvents: SystemEvents?
     private let presetIntervals = [5, 10, 15, 30]
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -21,6 +22,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = item
 
         scheduler.start(at: Date())
+        systemEvents = SystemEvents { [weak self] event in self?.handle(event) }
         ticker = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
@@ -55,6 +57,16 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let parent = NSMenuItem(title: "Every \(current) min", action: nil, keyEquivalent: "")
         parent.submenu = submenu
         return parent
+    }
+
+    private func handle(_ event: SystemEvents.Event) {
+        let now = Date()
+        switch event {
+        case .sleep: scheduler.didSleep(at: now); pill.hide()
+        case .lock: scheduler.didLock(at: now); pill.hide()
+        case .wake: scheduler.didWake(at: now)
+        case .unlock: scheduler.didUnlock(at: now)
+        }
     }
 
     private func tick() {
