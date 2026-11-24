@@ -35,10 +35,10 @@ public enum BuiltInList {
                     meaning: "There is no power and no strength except with Allah.",
                     source: "Sahih al-Bukhari 4205, Sahih Muslim 2704"),
         Remembrance(id: "astaghfirullah", kind: .zikr,
-                    arabic: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
-                    transliteration: "Astaghfirullaha wa atubu ilayh",
-                    meaning: "I seek Allah's forgiveness and turn to Him in repentance.",
-                    source: "Sahih al-Bukhari 6307"),
+                    arabic: "أَسْتَغْفِرُ اللَّهَ",
+                    transliteration: "Astaghfirullah",
+                    meaning: "I seek Allah's forgiveness.",
+                    source: "Sahih Muslim 591"),
         Remembrance(id: "hasbunallah", kind: .zikr,
                     arabic: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
                     transliteration: "Hasbunallahu wa ni'mal-wakil",
@@ -52,11 +52,11 @@ public enum BuiltInList {
     ]
 
     static let durood = Remembrance(
-        id: "durood-ibrahim", kind: .durood,
-        arabic: "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
-        transliteration: "Allahumma salli 'ala Muhammadin wa 'ala ali Muhammad, kama sallayta 'ala Ibrahima wa 'ala ali Ibrahim, innaka Hamidun Majid. Allahumma barik 'ala Muhammadin wa 'ala ali Muhammad, kama barakta 'ala Ibrahima wa 'ala ali Ibrahim, innaka Hamidun Majid",
-        meaning: "O Allah, send prayers on Muhammad and the family of Muhammad, as You sent prayers on Ibrahim and the family of Ibrahim; You are Praiseworthy, Glorious. O Allah, bless Muhammad and the family of Muhammad, as You blessed Ibrahim and the family of Ibrahim; You are Praiseworthy, Glorious.",
-        source: "Sahih al-Bukhari 3370")
+        id: "sallallahu-alayhi-wa-sallam", kind: .durood,
+        arabic: "صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ",
+        transliteration: "Sallallahu 'alayhi wa sallam",
+        meaning: "May Allah send blessings and peace upon him (the Prophet Muhammad).",
+        source: "Quran 33:56, Sahih Muslim 408")
 
     static let duas: [Remembrance] = [
         Remembrance(id: "rabbana-atina", kind: .dua,
