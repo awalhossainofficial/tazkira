@@ -37,11 +37,23 @@ Works on Macs with or without a notch. Pick one in Settings.
 
 Needs **macOS 14 (Sonoma) or later**. Works on Apple-chip and Intel Macs.
 
-1. Download **Zikr.zip** from the [latest release](https://github.com/awalhossainofficial/tazkira/releases/latest) and unzip it.
-2. Move `Zikr.app` into your Applications folder and open it.
-3. macOS will say it can't check the app for malware, because Zikr isn't signed with a paid Apple developer account. Click **Done**, then open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to Zikr. You only do this once.
+Open **Terminal** and paste this line. It downloads Zikr into your Applications folder and opens it:
 
-A small moon appears in the menu bar.
+```bash
+curl -fsSL https://github.com/awalhossainofficial/tazkira/releases/latest/download/Zikr.zip -o /tmp/Zikr.zip && ditto -x -k /tmp/Zikr.zip /Applications && open /Applications/Zikr.app
+```
+
+A small moon appears in the menu bar. To update later, quit Zikr from its menu and run the same line again.
+
+#### Downloaded it from the browser instead?
+
+Zikr isn't signed with a paid Apple developer account, so macOS says it "can't be opened" or "can't check it for malware". Move `Zikr.app` into Applications, then run this once in Terminal:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Zikr.app
+```
+
+Now it opens normally. You can also click **Open Anyway** in **System Settings → Privacy & Security** after the first warning.
 
 ### Build it yourself
 
