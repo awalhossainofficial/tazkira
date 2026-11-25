@@ -4,8 +4,8 @@ import ZikrCore
 
 @MainActor
 final class PillPresenter {
-    private let style: PillStyle
-    private let model = PillModel()
+    private var style: PillStyle
+    private let model: PillModel
     private let panel: NSPanel
     private let showFor: Duration = .seconds(8)
     private var remaining: Duration = .zero
@@ -13,12 +13,14 @@ final class PillPresenter {
     private var hideTask: Task<Void, Never>?
     private var isShowing = false
     private var isHovered = false
+    private var screen: NSScreen?
 
     /// Room around the Pill for its shadow.
     private let margin: CGFloat = 40
 
     init(style: PillStyle = IslandStyle()) {
         self.style = style
+        model = PillModel(style: style)
         panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
                         backing: .buffered, defer: true)
         panel.isOpaque = false
@@ -27,43 +29,64 @@ final class PillPresenter {
         panel.level = NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 3)
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         let host = NSHostingView(rootView: PillView(model: model))
-        // The panel keeps the size we give it; the black shape animates inside.
+        // The panel keeps the size we give it; the Pill animates inside.
         host.sizingOptions = []
         panel.contentView = host
         model.onHover = { [weak self] inside in self?.hoverChanged(inside) }
         model.onClick = { [weak self] in self?.hide() }
     }
 
-    func show(_ remembrance: Remembrance) {
-        let screen = NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) }
-            ?? NSScreen.main
-        guard let screen else { return }
-        let info = ScreenInfo(screen)
-        let open = style.openShape(for: remembrance, on: info)
+    /// Closes any open Pill at once so the next one starts clean in the new style.
+    func setStyle(_ newStyle: PillStyle) {
+        hideTask?.cancel()
+        panel.orderOut(nil)
+        isShowing = false
+        isHovered = false
+        model.phase = .closed
+        style = newStyle
+        model.style = newStyle
+    }
 
-        if !isShowing {
-            panel.setFrame(NSRect(x: screen.frame.midX - open.width / 2 - margin,
-                                  y: screen.frame.maxY - open.height - margin,
-                                  width: open.width + margin * 2, height: open.height + margin),
-                           display: false)
-            model.shape = style.closedShape(on: info)
-            model.isOpen = false
-            panel.orderFrontRegardless()
-        }
-        isShowing = true
-        model.content = style.content(for: remembrance, on: info)
-        // Let the closed shape render once so the growth animates.
-        DispatchQueue.main.async { [model] in
+    func show(_ remembrance: Remembrance) {
+        // A Pill already up stays on its screen; a new one follows the mouse.
+        let mouseScreen = NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) }
+        guard let screen = (isShowing ? screen : nil) ?? mouseScreen ?? NSScreen.main else { return }
+        let info = ScreenInfo(screen)
+        let size = style.largestSize(for: remembrance, on: info)
+        let gap = style.topGap(on: info)
+        // A gap above the Pill leaves room for the top of its shadow.
+        let topRoom = min(gap, margin)
+        var frame = NSRect(x: screen.frame.midX - size.width / 2 - margin,
+                           y: screen.frame.maxY - gap - size.height - margin,
+                           width: size.width + margin * 2, height: size.height + margin + topRoom)
+
+        if isShowing {
+            // Never shrink mid-animation, or the old Pill gets cut off.
+            frame = frame.union(panel.frame)
+            panel.setFrame(frame, display: true)
+            model.topRoom = topRoom
             withAnimation(.spring(response: 0.5, dampingFraction: 0.72)) {
-                model.shape = open
-                model.isOpen = true
+                model.remembrance = remembrance
+            }
+        } else {
+            panel.setFrame(frame, display: false)
+            model.topRoom = topRoom
+            model.screen = info
+            model.remembrance = remembrance
+            model.phase = .closed
+            panel.orderFrontRegardless()
+            // Let the closed Pill render once so the growth animates.
+            DispatchQueue.main.async { [model] in
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.72)) { model.phase = .open }
             }
         }
-        model.closedShape = style.closedShape(on: info)
+        self.screen = screen
+        isShowing = true
         if isHovered {
             // The clock starts when the mouse leaves.
             hideTask?.cancel()
             remaining = showFor
+            setProgress(paused: true)
         } else {
             restartTimer(for: showFor)
         }
@@ -74,10 +97,7 @@ final class PillPresenter {
         isShowing = false
         isHovered = false
         hideTask?.cancel()
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.9)) {
-            model.shape = model.closedShape
-            model.isOpen = false
-        }
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.9)) { model.phase = .closed }
         Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(450))
             guard let self, !self.isShowing else { return }
@@ -92,8 +112,12 @@ final class PillPresenter {
         if inside {
             hideTask?.cancel()
             remaining -= ContinuousClock.now - timerStarted
+            setProgress(paused: true)
         } else {
             restartTimer(for: max(remaining, .seconds(1)))
+        }
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            model.phase = inside ? .hovered : .open
         }
     }
 
@@ -101,45 +125,46 @@ final class PillPresenter {
         hideTask?.cancel()
         remaining = duration
         timerStarted = .now
+        setProgress(paused: false)
         hideTask = Task { [weak self] in
             try? await Task.sleep(for: duration)
             guard !Task.isCancelled else { return }
             self?.hide()
         }
     }
+
+    private func setProgress(paused: Bool) {
+        model.progress = PillProgress(fractionLeft: min(1, max(0, remaining / showFor)), isPaused: paused,
+                                      measuredAt: .now, total: showFor / .seconds(1))
+    }
 }
 
 @MainActor @Observable
 final class PillModel {
-    var shape = PillShape(width: 0, height: 0, bottomRadius: 0, opacity: 0)
-    var closedShape = PillShape(width: 0, height: 0, bottomRadius: 0, opacity: 0)
-    var isOpen = false
-    var content = AnyView(EmptyView())
+    var style: PillStyle
+    var remembrance: Remembrance?
+    var screen: ScreenInfo?
+    var phase = PillPhase.closed
+    var progress = PillProgress.full
+    var topRoom: CGFloat = 0
     var onHover: (Bool) -> Void = { _ in }
     var onClick: () -> Void = {}
+
+    init(style: PillStyle) { self.style = style }
 }
 
 private struct PillView: View {
     let model: PillModel
 
     var body: some View {
-        let shape = UnevenRoundedRectangle(bottomLeadingRadius: model.shape.bottomRadius,
-                                           bottomTrailingRadius: model.shape.bottomRadius)
-        shape
-            .fill(.black)
-            .overlay(alignment: .top) {
-                model.content
-                    .opacity(model.isOpen ? 1 : 0)
-                    .animation(model.isOpen ? .easeOut(duration: 0.3).delay(0.2) : .easeOut(duration: 0.18),
-                               value: model.isOpen)
+        Group {
+            if let remembrance = model.remembrance, let screen = model.screen {
+                model.style.pill(for: remembrance, on: screen, phase: model.phase, progress: model.progress)
+                    .onHover { model.onHover($0) }
+                    .onTapGesture { model.onClick() }
             }
-            .clipShape(shape)
-            .frame(width: model.shape.width, height: model.shape.height)
-            .opacity(model.shape.opacity)
-            .shadow(color: .black.opacity(model.isOpen ? 0.35 : 0), radius: 20, y: 14)
-            .contentShape(shape)
-            .onHover { model.onHover($0) }
-            .onTapGesture { model.onClick() }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .padding(.top, model.topRoom)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
