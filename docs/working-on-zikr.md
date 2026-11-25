@@ -52,7 +52,7 @@ The command-line scripts keep working alongside Xcode.
 ## Habits worth keeping
 
 - **Small commits on `main`**, one change each, with a plain-English message.
-- **Spec, then tickets, then code.** Features start as a spec and tickets under `.scratch/<feature>/`.
+- **Spec, then tickets, then code.** Features start as a spec and tickets under `.scratch/<feature>/`, a local folder that is not pushed to GitHub.
 - **Few tests, in the right places.** Test the rules in ZikrCore: timing, saving, Rounds, Pauses. Check the look on the real Mac.
 - **Glossary words in the code.** Use the names in `GLOSSARY.md` (Remembrance, Reminder, Pill, Pill Style, Preview, Interval, Round, Pause) for types and functions.
 - **Short comments that explain why**, never what the code already says.
