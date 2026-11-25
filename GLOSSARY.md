@@ -40,6 +40,10 @@ _Avoid_: Dynamic Island, notch, banner
 One visual design of the Pill: Island, Wings, Drop Card or Peek.
 _Avoid_: Theme, skin, layout
 
+**Preview**:
+A sample Pill shown when the user picks a Pill Style, so they can see the look; it is not a Reminder and does not count toward the Round or the Interval.
+_Avoid_: Sample, demo, test Reminder
+
 **Interval**:
 How many minutes pass between one Reminder and the next, chosen by the user.
 _Avoid_: Timer, frequency, mode
