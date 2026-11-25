@@ -35,7 +35,17 @@ Works on Macs with or without a notch. Pick one in Settings.
 
 ## Install
 
-There's no download yet, so you build it yourself. It takes about a minute and needs **macOS 14 (Sonoma) or later**.
+Needs **macOS 14 (Sonoma) or later**. Works on Apple-chip and Intel Macs.
+
+1. Download **Zikr.zip** from the [latest release](https://github.com/awalhossainofficial/tazkira/releases/latest) and unzip it.
+2. Move `Zikr.app` into your Applications folder and open it.
+3. macOS will say it can't check the app for malware, because Zikr isn't signed with a paid Apple developer account. Click **Done**, then open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to Zikr. You only do this once.
+
+A small moon appears in the menu bar.
+
+### Build it yourself
+
+If you'd rather build from the code, it takes about a minute.
 
 1. Install Apple's Command Line Tools if you haven't already. You don't need the full Xcode.
 
@@ -51,7 +61,7 @@ There's no download yet, so you build it yourself. It takes about a minute and n
    ./scripts/build-app.sh
    ```
 
-3. Move `build/Zikr.app` into your Applications folder and open it. A small moon appears in the menu bar.
+3. Move `build/Zikr.app` into your Applications folder and open it.
 
 ## The Remembrances
 
@@ -64,6 +74,7 @@ If you spot a mistake in the Arabic, the English letters, the meaning or a refer
 ```bash
 ./scripts/test.sh        # run the tests
 ./scripts/build-app.sh   # build build/Zikr.app
+./scripts/package-release.sh   # build build/Zikr.zip for a release
 ```
 
 [`docs/working-on-zikr.md`](docs/working-on-zikr.md) explains how the code is organised, and [`GLOSSARY.md`](GLOSSARY.md) defines the words used across it, such as Remembrance, Pill and Round.

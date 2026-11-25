@@ -1,12 +1,22 @@
 #!/bin/sh
-# Builds Zikr.app into build/ from the Swift package, ad-hoc signed for local use.
+# Builds Zikr.app into build/ from the Swift package, ad-hoc signed.
+# --universal builds for both Apple-chip and Intel Macs, for a download.
 set -e
 cd "$(dirname "$0")/.."
-swift build -c release --product Zikr
+if [ "$1" = "--universal" ]; then
+  for ARCH in arm64 x86_64; do
+    swift build -c release --product Zikr --triple "$ARCH-apple-macosx14.0"
+  done
+  BIN=.build/Zikr-universal
+  lipo -create -output "$BIN" .build/arm64-apple-macosx/release/Zikr .build/x86_64-apple-macosx/release/Zikr
+else
+  swift build -c release --product Zikr --triple "$(uname -m)-apple-macosx14.0"
+  BIN=".build/$(uname -m)-apple-macosx/release/Zikr"
+fi
 APP=build/Zikr.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp .build/release/Zikr "$APP/Contents/MacOS/Zikr"
+cp "$BIN" "$APP/Contents/MacOS/Zikr"
 if [ -d Resources/Fonts ]; then cp Resources/Fonts/* "$APP/Contents/Resources/"; fi
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
