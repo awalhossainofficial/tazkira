@@ -25,21 +25,7 @@ struct ScreenInfo {
 
 enum PillPhase { case closed, open, hovered }
 
-/// How much of the 8 seconds is left, so a style can draw the clock.
-struct PillProgress {
-    var fractionLeft: Double
-    var isPaused: Bool
-    var measuredAt: Date
-    var total: TimeInterval
-
-    func fractionLeft(at now: Date) -> Double {
-        isPaused ? fractionLeft : max(0, fractionLeft - now.timeIntervalSince(measuredAt) / total)
-    }
-
-    static let full = PillProgress(fractionLeft: 1, isPaused: true, measuredAt: .now, total: 8)
-}
-
-/// One visual design of the Pill. The style draws the whole Pill; the presenter owns timing and hover.
+/// One visual design of the Pill. The style draws the whole Pill; the Pill Clock owns timing.
 @MainActor
 protocol PillStyle {
     /// Space between the top of the screen and the Pill.
@@ -47,7 +33,7 @@ protocol PillStyle {
     /// The biggest the Pill gets for this Remembrance, so the window can fit every phase.
     func largestSize(for remembrance: Remembrance, on screen: ScreenInfo) -> CGSize
     func pill(for remembrance: Remembrance, on screen: ScreenInfo,
-              phase: PillPhase, progress: PillProgress) -> AnyView
+              phase: PillPhase, clock: PillClock) -> AnyView
 }
 
 extension PillStyle {
@@ -64,7 +50,7 @@ struct IslandStyle: PillStyle {
     }
 
     func pill(for remembrance: Remembrance, on screen: ScreenInfo,
-              phase: PillPhase, progress: PillProgress) -> AnyView {
+              phase: PillPhase, clock: PillClock) -> AnyView {
         let isOpen = phase != .closed
         return AnyView(TopPill(shape: isOpen ? openShape(for: remembrance, on: screen) : closedShape(on: screen),
                                isOpen: isOpen, content: content(for: remembrance, on: screen)))

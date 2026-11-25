@@ -7,12 +7,8 @@ final class PillPresenter {
     private var style: PillStyle
     private let model: PillModel
     private let panel: NSPanel
-    private let showFor: Duration = .seconds(8)
-    private var remaining: Duration = .zero
-    private var timerStarted = ContinuousClock.now
+    private var clock = PillClock()
     private var hideTask: Task<Void, Never>?
-    private var isShowing = false
-    private var isHovered = false
     private var screen: NSScreen?
 
     /// Room around the Pill for its shadow.
@@ -40,14 +36,14 @@ final class PillPresenter {
     func setStyle(_ newStyle: PillStyle) {
         hideTask?.cancel()
         panel.orderOut(nil)
-        isShowing = false
-        isHovered = false
+        clock.hide(at: .now)
         model.phase = .closed
         style = newStyle
         model.style = newStyle
     }
 
     func show(_ remembrance: Remembrance) {
+        let isShowing = clock.isShowing
         // A Pill already up stays on its screen; a new one follows the mouse.
         let mouseScreen = NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) }
         guard let screen = (isShowing ? screen : nil) ?? mouseScreen ?? NSScreen.main else { return }
@@ -81,61 +77,41 @@ final class PillPresenter {
             }
         }
         self.screen = screen
-        isShowing = true
-        if isHovered {
-            // The clock starts when the mouse leaves.
-            hideTask?.cancel()
-            remaining = showFor
-            setProgress(paused: true)
-        } else {
-            restartTimer(for: showFor)
-        }
+        clock.show(at: .now)
+        clockChanged()
     }
 
     func hide() {
-        guard isShowing else { return }
-        isShowing = false
-        isHovered = false
-        hideTask?.cancel()
+        guard clock.isShowing else { return }
+        clock.hide(at: .now)
+        clockChanged()
         withAnimation(.spring(response: 0.4, dampingFraction: 0.9)) { model.phase = .closed }
         Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(450))
-            guard let self, !self.isShowing else { return }
+            guard let self, !self.clock.isShowing else { return }
             self.panel.orderOut(nil)
         }
     }
 
-    // Hovering freezes the countdown; leaving resumes the time that was left.
     private func hoverChanged(_ inside: Bool) {
-        guard isShowing else { return }
-        isHovered = inside
-        if inside {
-            hideTask?.cancel()
-            remaining -= ContinuousClock.now - timerStarted
-            setProgress(paused: true)
-        } else {
-            restartTimer(for: max(remaining, .seconds(1)))
-        }
+        guard clock.isShowing else { return }
+        clock.hover(inside, at: .now)
+        clockChanged()
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             model.phase = inside ? .hovered : .open
         }
     }
 
-    private func restartTimer(for duration: Duration) {
+    /// Hands the Pill Clock to the style and sets one alarm for when it runs out.
+    private func clockChanged() {
+        model.clock = clock
         hideTask?.cancel()
-        remaining = duration
-        timerStarted = .now
-        setProgress(paused: false)
+        guard let hidesAt = clock.hidesAt else { return }
         hideTask = Task { [weak self] in
-            try? await Task.sleep(for: duration)
+            try? await Task.sleep(for: .seconds(max(0, hidesAt.timeIntervalSinceNow)))
             guard !Task.isCancelled else { return }
             self?.hide()
         }
-    }
-
-    private func setProgress(paused: Bool) {
-        model.progress = PillProgress(fractionLeft: min(1, max(0, remaining / showFor)), isPaused: paused,
-                                      measuredAt: .now, total: showFor / .seconds(1))
     }
 }
 
@@ -145,7 +121,7 @@ final class PillModel {
     var remembrance: Remembrance?
     var screen: ScreenInfo?
     var phase = PillPhase.closed
-    var progress = PillProgress.full
+    var clock = PillClock()
     var topRoom: CGFloat = 0
     var onHover: (Bool) -> Void = { _ in }
     var onClick: () -> Void = {}
@@ -159,7 +135,7 @@ private struct PillView: View {
     var body: some View {
         Group {
             if let remembrance = model.remembrance, let screen = model.screen {
-                model.style.pill(for: remembrance, on: screen, phase: model.phase, progress: model.progress)
+                model.style.pill(for: remembrance, on: screen, phase: model.phase, clock: model.clock)
                     .onHover { model.onHover($0) }
                     .onTapGesture { model.onClick() }
             }

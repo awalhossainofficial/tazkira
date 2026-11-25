@@ -12,7 +12,7 @@ struct PeekStyle: PillStyle {
     }
 
     func pill(for remembrance: Remembrance, on screen: ScreenInfo,
-              phase: PillPhase, progress: PillProgress) -> AnyView {
+              phase: PillPhase, clock: PillClock) -> AnyView {
         let shape: PillShape = switch phase {
         case .closed: .closedAtTop(on: screen)
         case .open: openShape(on: screen)

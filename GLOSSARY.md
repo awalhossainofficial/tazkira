@@ -40,6 +40,10 @@ _Avoid_: Dynamic Island, notch, banner
 One visual design of the Pill: Island, Wings, Drop Card or Peek.
 _Avoid_: Theme, skin, layout
 
+**Pill Clock**:
+The 8 seconds a Reminder stays on screen, which stop while the mouse is over the Pill and carry on when it leaves.
+_Avoid_: Timer, countdown, timeout
+
 **Preview**:
 A sample Pill shown when the user picks a Pill Style, so they can see the look; it is not a Reminder and does not count toward the Round or the Interval.
 _Avoid_: Sample, demo, test Reminder

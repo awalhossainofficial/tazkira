@@ -8,15 +8,15 @@ struct DropCardStyle: PillStyle {
     func topGap(on screen: ScreenInfo) -> CGFloat { 44 }
 
     func largestSize(for remembrance: Remembrance, on screen: ScreenInfo) -> CGSize {
-        CGSize(width: width, height: fittingHeight(of: card(for: remembrance, progress: .full), width: width))
+        CGSize(width: width, height: fittingHeight(of: card(for: remembrance, clock: PillClock()), width: width))
     }
 
     func pill(for remembrance: Remembrance, on screen: ScreenInfo,
-              phase: PillPhase, progress: PillProgress) -> AnyView {
+              phase: PillPhase, clock: PillClock) -> AnyView {
         let isOpen = phase != .closed
         let outline = RoundedRectangle(cornerRadius: 24, style: .continuous)
         return AnyView(
-            card(for: remembrance, progress: progress)
+            card(for: remembrance, clock: clock)
                 .frame(width: width)
                 .background(.black, in: outline)
                 .clipShape(outline)
@@ -28,7 +28,7 @@ struct DropCardStyle: PillStyle {
         )
     }
 
-    private func card(for remembrance: Remembrance, progress: PillProgress) -> some View {
+    private func card(for remembrance: Remembrance, clock: PillClock) -> some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 HStack {
@@ -62,20 +62,20 @@ struct DropCardStyle: PillStyle {
             .fixedSize(horizontal: false, vertical: true)
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 14, trailing: 20))
 
-            TimeLeftBar(progress: progress)
+            TimeLeftBar(clock: clock)
         }
     }
 }
 
 /// Drains from right to left as the 8 seconds run out, and holds still while paused.
 private struct TimeLeftBar: View {
-    let progress: PillProgress
+    let clock: PillClock
 
     var body: some View {
-        TimelineView(.animation(paused: progress.isPaused)) { context in
+        TimelineView(.animation(paused: !clock.isRunning)) { context in
             GeometryReader { geometry in
                 Rectangle().fill(.white.opacity(0.55))
-                    .frame(width: geometry.size.width * progress.fractionLeft(at: context.date))
+                    .frame(width: geometry.size.width * clock.fractionLeft(at: context.date))
             }
         }
         .frame(height: 3)
