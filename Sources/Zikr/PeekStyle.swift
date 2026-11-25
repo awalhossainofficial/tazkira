@@ -46,8 +46,6 @@ struct PeekStyle: PillStyle {
                         .foregroundStyle(.white.opacity(0.9))
                     Text(remembrance.meaning).font(.system(size: 13)).lineSpacing(3)
                         .foregroundStyle(.white.opacity(0.72))
-                    Text(remembrance.kindAndSource).font(.system(size: 11))
-                        .foregroundStyle(.white.opacity(0.42))
                 }
             }
             .multilineTextAlignment(.center).foregroundStyle(.white)

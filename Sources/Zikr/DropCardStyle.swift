@@ -22,7 +22,6 @@ struct DropCardStyle: PillStyle {
                 .clipShape(outline)
                 .shadow(color: .black.opacity(0.35), radius: 20, y: 14)
                 .contentShape(outline)
-                // It drops in from a little higher up.
                 .scaleEffect(isOpen ? 1 : 0.92, anchor: .top)
                 .offset(y: isOpen ? 0 : -18)
                 .opacity(isOpen ? 1 : 0)
