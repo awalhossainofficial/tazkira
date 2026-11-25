@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ZikrCore
+@testable import TazkiraCore
 
 @Suite struct PauseTests {
     // New York has a daylight-saving jump on 14 March 2027.

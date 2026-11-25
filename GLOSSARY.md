@@ -1,4 +1,4 @@
-# Zikr
+# Tazkira
 
 A Mac menu-bar app that gently reminds the user to remember Allah through the day by showing a short remembrance at the top of the screen.
 

@@ -1,6 +1,6 @@
 import AppKit
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 @MainActor
 final class PillPresenter {

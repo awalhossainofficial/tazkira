@@ -1,4 +1,4 @@
-# zikr
+# tazkira
 
 ## Agent skills
 

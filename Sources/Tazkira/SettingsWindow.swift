@@ -1,6 +1,6 @@
 import AppKit
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 /// The Settings window; it asks the Scheduler for every change so the rules live in one place.
 @MainActor
@@ -16,7 +16,7 @@ final class SettingsWindow {
     func show() {
         if window == nil {
             let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(model: model)))
-            window.title = "Zikr Settings"
+            window.title = "Tazkira Settings"
             window.styleMask = [.titled, .closable, .resizable]
             window.setContentSize(NSSize(width: 480, height: 600))
             window.isReleasedWhenClosed = false
@@ -66,7 +66,7 @@ final class SettingsModel {
     private func readLoginItem(keepingNote: Bool = false) {
         opensAtLogin = LoginItem.isOn || LoginItem.needsApproval
         if LoginItem.needsApproval {
-            loginNote = "Allow Zikr in System Settings › General › Login Items."
+            loginNote = "Allow Tazkira in System Settings › General › Login Items."
         } else if !keepingNote {
             loginNote = nil
         }
@@ -110,7 +110,7 @@ private struct SettingsView: View {
                 Text(refusal).foregroundStyle(.red)
             }
             Section("General") {
-                Toggle("Open Zikr at login", isOn: model.opensAtLoginBinding)
+                Toggle("Open Tazkira at login", isOn: model.opensAtLoginBinding)
                 if let note = model.loginNote {
                     Text(note).font(.caption).foregroundStyle(.secondary)
                 }

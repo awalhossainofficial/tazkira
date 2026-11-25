@@ -1,6 +1,6 @@
 import AppKit
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 struct PillShape: Equatable {
     var width: CGFloat

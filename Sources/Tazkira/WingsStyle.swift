@@ -1,5 +1,5 @@
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 /// A thin strip either side of the notch: the English letters on the left, the Arabic on the right.
 struct WingsStyle: PillStyle {

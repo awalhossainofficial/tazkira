@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ZikrCore
+@testable import TazkiraCore
 
 @Suite struct SwitchTests {
     func makeScheduler(_ count: Int, seed: UInt64) -> Scheduler {

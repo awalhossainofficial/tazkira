@@ -1,5 +1,5 @@
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 /// A separate card just below the menu bar, with a bar that runs down over the 8 seconds.
 struct DropCardStyle: PillStyle {
@@ -35,7 +35,7 @@ struct DropCardStyle: PillStyle {
                 HStack {
                     HStack(spacing: 6) {
                         Image(systemName: "moon.fill").font(.system(size: 10))
-                        Text("ZIKR").tracking(0.9)
+                        Text("TAZKIRA").tracking(0.9)
                     }
                     .foregroundStyle(.white.opacity(0.55))
                     Spacer()

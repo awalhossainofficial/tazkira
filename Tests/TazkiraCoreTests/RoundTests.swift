@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ZikrCore
+@testable import TazkiraCore
 
 @Suite struct RoundTests {
     func shown(_ count: Int, from listSize: Int, seed: UInt64) -> [String] {

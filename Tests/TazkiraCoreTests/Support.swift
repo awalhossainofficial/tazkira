@@ -1,5 +1,5 @@
 import Foundation
-@testable import ZikrCore
+@testable import TazkiraCore
 
 /// Repeatable shuffles so Round tests give the same answer every run.
 struct SeededRandom: RandomNumberGenerator {

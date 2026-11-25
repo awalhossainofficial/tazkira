@@ -1,5 +1,5 @@
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 /// Only the Arabic on one line; hovering opens the rest.
 struct PeekStyle: PillStyle {

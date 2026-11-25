@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ZikrCore
+@testable import TazkiraCore
 
 @Suite struct IntervalTests {
     func makeScheduler(interval: Int = 15) -> Scheduler {

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-import ZikrCore
+import TazkiraCore
 
 @Suite struct PillClockTests {
     @Test func eachReminderGetsTheFullEightSeconds() {

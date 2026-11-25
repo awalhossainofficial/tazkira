@@ -1,5 +1,5 @@
 import SwiftUI
-import ZikrCore
+import TazkiraCore
 
 /// Grows out of the notch into a card sized to the text.
 struct IslandStyle: PillStyle {

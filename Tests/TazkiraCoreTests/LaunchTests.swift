@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ZikrCore
+@testable import TazkiraCore
 
 @Suite struct LaunchTests {
     func launch(with state: SchedulerState) -> (Scheduler, Remembrance?) {

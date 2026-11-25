@@ -1,5 +1,5 @@
 import AppKit
-import ZikrCore
+import TazkiraCore
 
 @MainActor
 final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
@@ -21,7 +21,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         ArabicFont.registerBundledFonts()
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        let icon = NSImage(systemSymbolName: "moon.stars", accessibilityDescription: "Zikr")
+        let icon = NSImage(systemSymbolName: "moon.stars", accessibilityDescription: "Tazkira")
         icon?.isTemplate = true
         item.button?.image = icon
         let menu = NSMenu()
@@ -39,7 +39,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         ticker = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
-        // For checking the Pill by hand: open Zikr.app --args -remindOnLaunch YES
+        // For checking the Pill by hand: open Tazkira.app --args -remindOnLaunch YES
         if UserDefaults.standard.bool(forKey: "remindOnLaunch") { remindMeNow() }
     }
 
@@ -63,7 +63,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let settingsItem = action("Settings…", #selector(openSettings))
         settingsItem.keyEquivalent = ","
         menu.addItem(settingsItem)
-        menu.addItem(NSMenuItem(title: "Quit Zikr", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit Tazkira", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
 
     private func intervalMenu() -> NSMenuItem {

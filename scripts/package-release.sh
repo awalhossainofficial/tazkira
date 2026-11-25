@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds Zikr.zip and its release notes. With --publish it also creates the GitHub release.
+# Builds Tazkira.zip and its release notes. With --publish it also creates the GitHub release.
 # Usage: ./scripts/package-release.sh [--publish] [whats-new.md]
 set -e
 cd "$(dirname "$0")/.."
@@ -18,17 +18,17 @@ if [ -n "$PUBLISH" ]; then
 fi
 
 ./scripts/build-app.sh --universal
-rm -f build/Zikr.zip
-ditto -c -k --keepParent build/Zikr.app build/Zikr.zip
+rm -f build/Tazkira.zip
+ditto -c -k --keepParent build/Tazkira.app build/Tazkira.zip
 
-VERSION=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' build/Zikr.app/Contents/Info.plist)
+VERSION=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' build/Tazkira.app/Contents/Info.plist)
 {
   if [ -n "$WHATS_NEW" ]; then cat "$WHATS_NEW"; echo; fi
   cat docs/release-install.md
 } > build/release-notes.md
-echo "Packaged build/Zikr.zip and build/release-notes.md for version $VERSION"
+echo "Packaged build/Tazkira.zip and build/release-notes.md for version $VERSION"
 
 if [ -n "$PUBLISH" ]; then
-  gh release create "v$VERSION" build/Zikr.zip --title "Zikr $VERSION" \
+  gh release create "v$VERSION" build/Tazkira.zip --title "Tazkira $VERSION" \
     --notes-file build/release-notes.md --target "$(git rev-parse HEAD)"
 fi

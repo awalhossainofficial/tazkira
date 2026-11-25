@@ -1,5 +1,5 @@
 import Foundation
-import ZikrCore
+import TazkiraCore
 
 enum StateStore {
     private static let key = "schedulerState"
