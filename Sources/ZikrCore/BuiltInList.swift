@@ -3,6 +3,9 @@
 public enum BuiltInList {
     public static let all: [Remembrance] = adhkar + [durood] + duas
 
+    /// Shown when the user picks a Pill Style, always the same so styles compare fairly.
+    public static var preview: Remembrance { all.first { $0.id == "subhanallah-wa-bihamdihi" }! }
+
     static let adhkar: [Remembrance] = [
         Remembrance(id: "subhanallah-wa-bihamdihi", kind: .zikr,
                     arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",

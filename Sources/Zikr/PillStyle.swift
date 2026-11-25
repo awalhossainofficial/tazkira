@@ -70,15 +70,11 @@ struct IslandStyle: PillStyle {
                                isOpen: isOpen, content: content(for: remembrance, on: screen)))
     }
 
-    private func closedShape(on screen: ScreenInfo) -> PillShape {
-        screen.hasNotch
-            ? PillShape(width: screen.notchWidth, height: screen.notchHeight, bottomRadius: 12)
-            : PillShape(width: 120, height: 18, bottomRadius: 12, opacity: 0)
-    }
+    private func closedShape(on screen: ScreenInfo) -> PillShape { .closedAtTop(on: screen) }
 
     private func openShape(for remembrance: Remembrance, on screen: ScreenInfo) -> PillShape {
-        let measured = NSHostingView(rootView: content(for: remembrance, on: screen).frame(width: width))
-        return PillShape(width: width, height: ceil(measured.fittingSize.height), bottomRadius: 36)
+        PillShape(width: width, height: fittingHeight(of: content(for: remembrance, on: screen), width: width),
+                  bottomRadius: 36)
     }
 
     private func content(for remembrance: Remembrance, on screen: ScreenInfo) -> AnyView {
@@ -122,6 +118,45 @@ struct TopPill: View {
             .opacity(shape.opacity)
             .shadow(color: .black.opacity(isOpen ? 0.35 : 0), radius: 20, y: 14)
             .contentShape(outline)
+    }
+}
+
+extension PillShape {
+    /// The Pill before it grows: the notch itself, or nothing on a Mac without one.
+    static func closedAtTop(on screen: ScreenInfo) -> PillShape {
+        screen.hasNotch
+            ? PillShape(width: screen.notchWidth, height: screen.notchHeight, bottomRadius: 12)
+            : PillShape(width: 120, height: 18, bottomRadius: 12, opacity: 0)
+    }
+}
+
+@MainActor
+func fittingHeight(of view: some View, width: CGFloat) -> CGFloat {
+    ceil(NSHostingView(rootView: view.frame(width: width)).fittingSize.height)
+}
+
+extension Remembrance {
+    var kindAndSource: String { "\(kind.rawValue) · \(source)" }
+}
+
+extension PillStyleChoice {
+    /// The styles listed in Settings, in order.
+    static let offered: [PillStyleChoice] = [.island, .peek]
+
+    var name: String {
+        switch self {
+        case .island: "Island"
+        case .wings: "Wings"
+        case .dropCard: "Drop Card"
+        case .peek: "Peek"
+        }
+    }
+
+    @MainActor var style: PillStyle {
+        switch self {
+        case .island, .wings, .dropCard: IslandStyle()
+        case .peek: PeekStyle()
+        }
     }
 }
 

@@ -85,6 +85,8 @@ public final class Scheduler {
         restartCountdown(at: now)
     }
 
+    public func setPillStyle(_ style: PillStyleChoice) { state.pillStyle = style }
+
     public func isOn(_ id: String) -> Bool { !state.switchedOff.contains(id) }
 
     public func setOn(_ id: String, _ on: Bool) throws {

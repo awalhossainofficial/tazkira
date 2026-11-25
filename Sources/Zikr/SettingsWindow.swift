@@ -8,8 +8,9 @@ final class SettingsWindow {
     private var window: NSWindow?
     private let model: SettingsModel
 
-    init(scheduler: Scheduler, onChange: @escaping () -> Void) {
-        model = SettingsModel(scheduler: scheduler, onChange: onChange)
+    init(scheduler: Scheduler, onChange: @escaping () -> Void,
+         onPickStyle: @escaping (PillStyleChoice) -> Void) {
+        model = SettingsModel(scheduler: scheduler, onChange: onChange, onPickStyle: onPickStyle)
     }
 
     func show() {
@@ -32,18 +33,23 @@ final class SettingsWindow {
 final class SettingsModel {
     private let scheduler: Scheduler
     private let onChange: () -> Void
+    private let onPickStyle: (PillStyleChoice) -> Void
     private(set) var switchedOff: Set<String> = []
+    private(set) var pillStyle = PillStyleChoice.island
     private(set) var opensAtLogin = false
     private(set) var loginNote: String?
     var refusal: String?
 
-    init(scheduler: Scheduler, onChange: @escaping () -> Void) {
+    init(scheduler: Scheduler, onChange: @escaping () -> Void,
+         onPickStyle: @escaping (PillStyleChoice) -> Void) {
         self.scheduler = scheduler
         self.onChange = onChange
+        self.onPickStyle = onPickStyle
     }
 
     func refresh() {
         switchedOff = scheduler.state.switchedOff
+        pillStyle = scheduler.state.pillStyle
         refusal = nil
         readLoginItem()
     }
@@ -64,6 +70,19 @@ final class SettingsModel {
         } else if !keepingNote {
             loginNote = nil
         }
+    }
+
+    // Saved before the switch, so a quit right after still keeps the choice.
+    var pillStyleBinding: Binding<PillStyleChoice> {
+        Binding(
+            get: { self.pillStyle },
+            set: { choice in
+                guard choice != self.pillStyle else { return }
+                self.scheduler.setPillStyle(choice)
+                self.pillStyle = choice
+                self.onChange()
+                self.onPickStyle(choice)
+            })
     }
 
     func binding(for id: String) -> Binding<Bool> {
@@ -95,6 +114,13 @@ private struct SettingsView: View {
                 if let note = model.loginNote {
                     Text(note).font(.caption).foregroundStyle(.secondary)
                 }
+            }
+            Section("Pill style") {
+                Picker("Pill style", selection: model.pillStyleBinding) {
+                    ForEach(PillStyleChoice.offered, id: \.self) { Text($0.name).tag($0) }
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
             }
             Section("Remembrances") {
                 ForEach(BuiltInList.all) { remembrance in

@@ -25,4 +25,17 @@ import Testing
         #expect(old.switchedOff.isEmpty)
         #expect(launch(with: old).1 == nil)
     }
+
+    @Test func aMissingOrUnknownPillStyleLoadsAsIslandAndKeepsTheRest() throws {
+        let decode = { (json: String) in try JSONDecoder().decode(SchedulerState.self, from: Data(json.utf8)) }
+        #expect(try decode(#"{"intervalMinutes":30}"#).pillStyle == .island)
+
+        let unknown = try decode(#"{"intervalMinutes":10,"switchedOff":["astaghfirullah"],"pillStyle":"lava"}"#)
+        #expect(unknown.pillStyle == .island)
+        #expect(unknown.intervalMinutes == 10)
+        #expect(unknown.switchedOff == ["astaghfirullah"])
+
+        let saved = try JSONEncoder().encode(SchedulerState(pillStyle: .peek))
+        #expect(try JSONDecoder().decode(SchedulerState.self, from: saved).pillStyle == .peek)
+    }
 }

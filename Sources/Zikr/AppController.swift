@@ -4,12 +4,19 @@ import ZikrCore
 @MainActor
 final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let scheduler = Scheduler(list: BuiltInList.all, state: StateStore.load())
-    private let pill = PillPresenter()
+    private lazy var pill = PillPresenter(style: scheduler.state.pillStyle.style)
     private var statusItem: NSStatusItem?
     private var ticker: Timer?
     private var systemEvents: SystemEvents?
     private let presetIntervals = [5, 10, 15, 30]
-    private lazy var settings = SettingsWindow(scheduler: scheduler) { [unowned self] in StateStore.save(scheduler.state) }
+    private lazy var settings = SettingsWindow(
+        scheduler: scheduler,
+        onChange: { [unowned self] in StateStore.save(scheduler.state) },
+        // The Preview goes straight to the Pill, so the Round, the clock and a Pause stay untouched.
+        onPickStyle: { [unowned self] choice in
+            pill.setStyle(choice.style)
+            pill.show(BuiltInList.preview)
+        })
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         ArabicFont.registerBundledFonts()
