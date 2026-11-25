@@ -149,7 +149,7 @@ extension Remembrance {
 
 extension PillStyleChoice {
     /// The styles listed in Settings, in order.
-    static let offered: [PillStyleChoice] = [.island, .wings, .peek]
+    static let offered: [PillStyleChoice] = [.island, .wings, .dropCard, .peek]
 
     var name: String {
         switch self {
@@ -162,8 +162,9 @@ extension PillStyleChoice {
 
     @MainActor var style: PillStyle {
         switch self {
-        case .island, .dropCard: IslandStyle()
+        case .island: IslandStyle()
         case .wings: WingsStyle()
+        case .dropCard: DropCardStyle()
         case .peek: PeekStyle()
         }
     }
