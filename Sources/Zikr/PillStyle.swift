@@ -97,14 +97,13 @@ struct IslandStyle: PillStyle {
 }
 
 /// A black shape hanging from the top edge, square on top and rounded below.
-struct TopPill: View {
+struct TopPill<Outline: Shape>: View {
     let shape: PillShape
+    let outline: Outline
     let isOpen: Bool
     let content: AnyView
 
     var body: some View {
-        let outline = UnevenRoundedRectangle(bottomLeadingRadius: shape.bottomRadius,
-                                             bottomTrailingRadius: shape.bottomRadius)
         outline
             .fill(.black)
             .overlay(alignment: .top) {
@@ -118,6 +117,15 @@ struct TopPill: View {
             .opacity(shape.opacity)
             .shadow(color: .black.opacity(isOpen ? 0.35 : 0), radius: 20, y: 14)
             .contentShape(outline)
+    }
+}
+
+extension TopPill where Outline == UnevenRoundedRectangle {
+    init(shape: PillShape, isOpen: Bool, content: AnyView) {
+        self.init(shape: shape,
+                  outline: UnevenRoundedRectangle(bottomLeadingRadius: shape.bottomRadius,
+                                                  bottomTrailingRadius: shape.bottomRadius),
+                  isOpen: isOpen, content: content)
     }
 }
 
@@ -141,7 +149,7 @@ extension Remembrance {
 
 extension PillStyleChoice {
     /// The styles listed in Settings, in order.
-    static let offered: [PillStyleChoice] = [.island, .peek]
+    static let offered: [PillStyleChoice] = [.island, .wings, .peek]
 
     var name: String {
         switch self {
@@ -154,7 +162,8 @@ extension PillStyleChoice {
 
     @MainActor var style: PillStyle {
         switch self {
-        case .island, .wings, .dropCard: IslandStyle()
+        case .island, .dropCard: IslandStyle()
+        case .wings: WingsStyle()
         case .peek: PeekStyle()
         }
     }
