@@ -29,6 +29,14 @@ The rule that keeps this clean: anything that is a decision (when to show, what 
 open build/Zikr.app        # run it
 ```
 
+## Making a release
+
+1. Raise the version (`CFBundleShortVersionString`) in `scripts/build-app.sh`, then commit and push.
+2. Write a few lines on what's new in a file, for example `whats-new.md`.
+3. Run `./scripts/package-release.sh --publish whats-new.md`.
+
+The script builds Zikr.zip for Apple-chip and Intel Macs and creates the GitHub release, tagged with the version. It adds the install guide from `docs/release-install.md` under your notes, so every release explains how to get past the macOS warning. Without `--publish` it only builds the zip and notes in `build/`, so you can check them first.
+
 ## Xcode
 
 Most Mac developers write code in **Xcode**, Apple's free editor from the Mac App Store. This project doesn't need it, because it is a plain Swift package and the command-line tools build it. But Xcode is worth installing once you start changing the code yourself:

@@ -86,7 +86,7 @@ If you spot a mistake in the Arabic, the English letters, the meaning or a refer
 ```bash
 ./scripts/test.sh        # run the tests
 ./scripts/build-app.sh   # build build/Zikr.app
-./scripts/package-release.sh   # build build/Zikr.zip for a release
+./scripts/package-release.sh   # build build/Zikr.zip and its release notes
 ```
 
 [`docs/working-on-zikr.md`](docs/working-on-zikr.md) explains how the code is organised, and [`GLOSSARY.md`](GLOSSARY.md) defines the words used across it, such as Remembrance, Pill and Round.
