@@ -14,7 +14,8 @@ final class PillPresenter {
     /// Room around the Pill for its shadow.
     private let margin: CGFloat = 40
 
-    init(style: PillStyle = IslandStyle()) {
+    init(choice: PillStyleChoice = .island) {
+        let style = choice.style
         self.style = style
         model = PillModel(style: style)
         panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
@@ -33,7 +34,8 @@ final class PillPresenter {
     }
 
     /// Closes any open Pill at once so the next one starts clean in the new style.
-    func setStyle(_ newStyle: PillStyle) {
+    func setStyle(_ choice: PillStyleChoice) {
+        let newStyle = choice.style
         hideTask?.cancel()
         panel.orderOut(nil)
         clock.hide(at: .now)

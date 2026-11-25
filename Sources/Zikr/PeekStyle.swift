@@ -3,6 +3,7 @@ import ZikrCore
 
 /// Only the Arabic on one line; hovering opens the rest.
 struct PeekStyle: PillStyle {
+    let name = "Peek"
     private let hoveredWidth: CGFloat = 470
     private let lineHeight: CGFloat = 48
 

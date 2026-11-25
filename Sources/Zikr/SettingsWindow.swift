@@ -117,7 +117,7 @@ private struct SettingsView: View {
             }
             Section("Pill style") {
                 Picker("Pill style", selection: model.pillStyleBinding) {
-                    ForEach(PillStyleChoice.offered, id: \.self) { Text($0.name).tag($0) }
+                    ForEach(PillStyleChoice.allCases, id: \.self) { Text($0.style.name).tag($0) }
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()

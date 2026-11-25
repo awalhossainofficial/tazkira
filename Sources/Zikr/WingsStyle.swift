@@ -3,6 +3,7 @@ import ZikrCore
 
 /// A thin strip either side of the notch: the English letters on the left, the Arabic on the right.
 struct WingsStyle: PillStyle {
+    let name = "Wings"
     private let noNotchGap: CGFloat = 24
 
     func largestSize(for remembrance: Remembrance, on screen: ScreenInfo) -> CGSize {

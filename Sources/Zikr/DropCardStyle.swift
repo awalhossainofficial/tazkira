@@ -3,6 +3,7 @@ import ZikrCore
 
 /// A separate card just below the menu bar, with a bar that runs down over the 8 seconds.
 struct DropCardStyle: PillStyle {
+    let name = "Drop Card"
     private let width: CGFloat = 400
 
     func topGap(on screen: ScreenInfo) -> CGFloat { 44 }

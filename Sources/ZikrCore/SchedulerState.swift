@@ -30,7 +30,7 @@ public struct SchedulerState: Codable, Equatable, Sendable {
     }
 }
 
-/// Which Pill Style the user picked.
+/// Which Pill Style the user picked. Settings lists the cases in this order.
 public enum PillStyleChoice: String, Codable, CaseIterable, Sendable {
     case island, wings, dropCard, peek
 }

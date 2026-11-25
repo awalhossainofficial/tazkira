@@ -4,7 +4,7 @@ import ZikrCore
 @MainActor
 final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let scheduler = Scheduler(list: BuiltInList.all, state: StateStore.load())
-    private lazy var pill = PillPresenter(style: scheduler.state.pillStyle.style)
+    private lazy var pill = PillPresenter(choice: scheduler.state.pillStyle)
     private var statusItem: NSStatusItem?
     private var ticker: Timer?
     private var systemEvents: SystemEvents?
@@ -14,7 +14,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         onChange: { [unowned self] in StateStore.save(scheduler.state) },
         // The Preview goes straight to the Pill, so the Round, the clock and a Pause stay untouched.
         onPickStyle: { [unowned self] choice in
-            pill.setStyle(choice.style)
+            pill.setStyle(choice)
             pill.show(BuiltInList.preview)
         })
 
